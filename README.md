@@ -180,3 +180,6 @@ Alternatively, you can edit the `GBSCONTROL_ADDRESS` variable to reflect your ne
 
 		 /AUTOG   Auto Gain Adjust Toggle
 
+## Thanks
+
+Thanks to @danhans42 for suggesting the http module and providing example code and to @ramapcsx2 for this great software !
