@@ -804,7 +804,7 @@ def main():
 
         command = "n"
 
-        print("Vertical -")
+        print("Gain ++")
     
     if arg == "/GAIND":
     
@@ -812,15 +812,15 @@ def main():
 
         command = "o"
 
-        print("Vertical -")
+        print("Gain --")
     
-    if arg == "/VERT-":
+    if arg == "/AUTOG":
     
         context = "sc"
 
         command = "T"
 
-        print("Vertical -")
+        print("Auto gain")
 
     
     # Send the command
