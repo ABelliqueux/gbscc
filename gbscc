@@ -1,0 +1,840 @@
+#!/usr/bin/env python
+
+# gbscc - gbscontrolcontrol by Schnappy, license GNU General Public License v3.0
+# 
+# Send commands to a wifi enabled gbs-control instance over http
+
+
+# Adapt to your network ( can be an ip or a hostname )
+
+GBSCONTROL_ADDRESS = "gbscontrol.local"
+
+
+
+import sys
+import http.client
+
+conn = http.client.HTTPConnection( GBSCONTROL_ADDRESS )
+
+context = ""
+
+command = ""
+
+def main():
+
+    global context, command
+
+    arg = sys.argv
+
+    if len(arg) > 1:
+        
+        if len(arg) > 2:
+            
+            print("More than one argument given !")
+
+        else:
+            
+            arg = arg[1]
+
+    else:
+        
+        print("No argument given. Type 'gbscc /HELP to see the list of available commands.' ")
+        
+    if arg == "-h" or arg == "--help" or arg == "/HELP":
+
+        print(
+        
+        "A python command line utility to send commands to a wifi enabled gbs-control over http.\n\n" +
+        
+        "Usage : gbscc /COMMAND \n\n" +
+        
+        "Available commands :\n\n" +
+        
+    "\tPresets :\n\n" +
+        
+        "\t\tVideo modes:\n\n" +
+    
+        "\t\t /720P   1280x720\n\n" +
+        
+        "\t\t /960P   1280x960\n\n" +
+        
+        "\t\t /1024P  1280x1024\n\n" +
+        
+        "\t\t /1080P  1920x1080\n\n" +
+        
+        "\t\t /SD     NTSC : 720x480 / PAL : 768x576 \n\n" +
+        
+        "\t\t /15K    15Khz Scale Down \n\n" +
+        
+        "\t\t /PASS   Pass Through \n\n" +
+            
+    "\tSlots :\n\n" +
+    
+        "\t\t /1      Load Slot 1\n\n" +
+        
+        "\t\t /2      Load Slot 2\n\n" +
+        
+        "\t\t /3      Load Slot 3\n\n" +
+        
+        "\t\t /4      Load Slot 4\n\n" +
+        
+        "\t\t /5      Load Slot 5\n\n" +
+        
+        "\t\t /6      Load Slot 6\n\n" +
+        
+        "\t\t /7      Load Slot 7\n\n" +
+        
+        "\t\t /8      Load Slot 8\n\n" +
+        
+        "\t\t /9      Load Slot 9\n\n" +
+        
+        "\t\t /LOAD   Load Custom preset\n\n" +
+        
+        "\t\t /SAVE   Save Custom preset\n\n" +
+        
+    "\tSystem :\n\n" +
+        
+        "\t\t /RESET  Reset the GBS\n\n" + 
+        
+    "\tEnhancements:\n\n" + 
+        
+        "\t\t /SCNLN   240P Scanlines\n\n" + 
+        
+        "\t\t /LINEF   Line filter\n\n" + 
+        
+        "\t\t /PEAK    Peaking\n\n" + 
+        
+        "\t\t /STEPR   Step response\n\n" + 
+        
+        "\t\t /SCNLS   Scanline strength\n\n" + 
+    
+    "\tPreferences:\n\n" + 
+    
+        "\t\t /MATCH   Matched presets\n\n" +
+        
+        "\t\t /FULLH   Full height\n\n" +
+        
+        "\t\t /UPSCL   Low Res: Use Upscaling\n\n" +
+        
+        "\t\t /60H     Force 60hz\n\n" +
+        
+        "\t\t /ADCCAL  ADC calibration\n\n" +
+        
+        "\t\t /FRMTL   FrameTime lock\n\n" +
+        
+        "\t\t /SWLCK   Switch lock method\n\n" +
+        
+        "\t\t /RGBC    RGBHV/Component Toggle\n\n" +
+
+        "\t\t /MAD     Deinterlace motion adaptive\n\n" +
+
+        "\t\t /BOB     Deinterlace bob\n\n" +
+            
+    "\tDevelopment:\n\n" + 
+            
+        "\t\t /FREEZ   Freeze capture\n\n" +
+        
+        "\t\t /MBL     Move picture left (memory blank)\n\n" +
+
+        "\t\t /MBR     Move picture right (memory blank)\n\n" +
+
+        "\t\t /HSL     Horizontal Sync Left\n\n" +
+
+        "\t\t /HSR     Horizontal Sync Right\n\n" +
+
+        "\t\t /INFO    Print infos\n\n" +
+
+        "\t\t /TIMI    Get video timings\n\n" +
+
+        "\t\t /CLKR    Cycle Sdram clock speed\n\n" +
+
+        "\t\t /RSTC    Reset chip\n\n" +
+
+        "\t\t /INVS    Invert sync\n\n" +
+ 
+        "\t\t /PLLD    PLL divider++\n\n" +
+
+        "\t\t /DEBG    Debug view\n\n" +
+
+        "\t\t /ADCF    ADC filter\n\n" +
+
+        "\t\t /OVRS    Oversampling\n\n" +
+
+        "\t\t /HTOTU   HTotal++ \n\n" +
+
+        "\t\t /HTOTD   HTotal-- \n\n" +
+
+        "\t\t /SNCHT   Resynch HTotal\n\n" +
+
+        "\t\t /RSTS    Reset sync processor\n\n" +
+        
+        "\t\t /SNAP    Snap to 50/60hz\n\n" +
+ 
+        "\t\t /SNCW    Syncwatcher\n\n" +
+
+        "\t\t /OTA     Enable OTA update\n\n" +
+
+        "\t\t /IFAO    IF auto offset\n\n" +
+        
+        "\t\t /SOGL    SOG Level --\n\n" +
+        
+    "\tPicture Control:\n\n" +
+    
+    "\t\tMove picture:\n\n" +
+    
+        "\t\t /MVU    Up\n\n" +
+        
+        "\t\t /MVD    Down\n\n" +
+        
+        "\t\t /MVL     Left\n\n" +
+        
+        "\t\t /MVR     Right\n\n" +
+        
+    "\t\tScaling:\n\n" +
+        
+        "\t\t /HORZU   Horizontal +\n\n" +
+        
+        "\t\t /HORZD   Horizontal -\n\n" +
+        
+        "\t\t /VERTU   Vertical + \n\n" +
+        
+        "\t\t /VERTD   Vertical -\n\n" +
+        
+    "\t\tBorder masking:\n\n" +
+      
+        "\t\t /BMHU    Horizontal +\n\n" +
+        
+        "\t\t /BMHD    Horizontal -\n\n" +
+        
+        "\t\t /BMVU    Vertical +\n\n" +
+        
+        "\t\t /BMVD    Vertical -\n\n" +
+        
+    "\t\tGain:\n\n" +
+      
+        "\t\t /GAINU   Gain +\n\n" +
+        
+        "\t\t /GAIND   Gain -\n\n" +
+        
+        "\t\t /AUTOG   Auto Gain Adjust Toggle\n"
+        
+        )
+
+    # SYSTEM
+        
+    if arg == "/REST":
+    
+        context = "uc"
+
+        command = "a"
+
+        print("Reset command sent...")
+        
+    # PRESETS
+    
+    ## Video modes
+    
+    if arg == "/960P":
+    
+        context = "uc"
+
+        command = "f"
+
+        print("Switching to 1280x960...")
+    
+    if arg == "/1024P":
+    
+        context = "uc"
+
+        command = "p"
+
+        print("Switching to 1280x1024...")
+    
+    if arg == "/720P":
+        
+        context = "uc"
+
+        command = "g"
+
+        print("Switching to 1280x720...")
+    
+    if arg == "/1080P":
+    
+        context = "uc"
+
+        command = "s"
+
+        print("Switching to 1920x1080...")
+    
+    if arg == "/SD":
+        
+        context = "uc"
+
+        command = "h"
+
+        print("Switching to SD...")
+        
+    if arg == "/15K":
+        
+        context = "uc"
+
+        command = "L"
+
+        print("Switching to 15Khz Scale down...")
+    
+    if arg == "/PASS":
+    
+        context = "uc"
+
+        command = "K"
+
+        print("Switching to Pass-through...")
+    
+    ## Slots
+    
+    if arg == "/1":
+    
+        context = "uc"
+
+        command = "b"
+
+        print("Using Slot 1 for preset.")
+    
+    if arg == "/2":
+    
+        context = "uc"
+
+        command = "c"
+
+        print("Using Slot 2 for preset.")
+    
+    if arg == "/3":
+    
+        context = "uc"
+
+        command = "d"
+
+        print("Using Slot 3 for preset.")
+    
+    if arg == "/4":
+    
+        context = "uc"
+
+        command = "j"
+
+        print("Using Slot 4 for preset.")
+    
+    if arg == "/5":
+    
+        context = "uc"
+
+        command = "k"
+
+        print("Using Slot 5 for preset.")
+
+    if arg == "/6":
+    
+        context = "uc"
+
+        command = "G"
+
+        print("Using Slot 6 for preset.")
+        
+    if arg == "/7":
+    
+        context = "uc"
+
+        command = "H"
+
+        print("Using Slot 7 for preset.")
+        
+    if arg == "/8":
+    
+        context = "uc"
+
+        command = "I"
+
+        print("Using Slot 8 for preset.")
+        
+    if arg == "/9":
+    
+        context = "uc"
+
+        command = "J"
+
+        print("Using Slot 9 for preset.")
+        
+    if arg == "/SAVE":
+    
+        context = "uc"
+
+        command = "3"
+
+        print("Saving preset to selected slot.")
+        
+    if arg == "/LOAD":
+    
+        context = "uc"
+
+        command = "4"
+
+        print("Loading preset from selected slot.")
+    
+    
+    # ENHANCEMENTS
+    
+    
+    if arg == "/SCNLN":
+    
+        context = "uc"
+
+        command = "7"
+
+        print(" 240P Scanlines")
+    
+    if arg == "/LINEF":
+    
+        context = "uc"
+
+        command = "m"
+
+        print("Line Filter")
+    
+    if arg == "/PEAK":
+    
+        context = "uc"
+
+        command = "f"
+
+        print("Peaking")
+    
+    if arg == "/STEPR":
+    
+        context = "uc"
+
+        command = "V"
+
+        print("Step Response")
+    
+    if arg == "/SCNLS":
+    
+        context = "uc"
+
+        command = "K"
+
+        print("Scanline strength")
+    
+    # PREFERENCES
+    
+    if arg == "/MATCH":
+    
+        context = "uc"
+
+        command = "Z"
+
+        print("Matched presets")
+    
+    if arg == "/FULLH":
+    
+        context = "uc"
+
+        command = "v"
+
+        print("Full height")
+    
+    if arg == "/UPSCL":
+    
+        context = "uc"
+
+        command = "x"
+
+        print("Low Res: Use Upscaling")
+    
+    if arg == "/60H":
+    
+        context = "uc"
+
+        command = "0"
+
+        print("Force 60hz")
+    
+    if arg == "/ADCCAL":
+    
+        context = "uc"
+
+        command = "w"
+
+        print("ADC calibration")
+    
+    if arg == "/FRMTL":
+    
+        context = "uc"
+
+        command = "5"
+
+        print("FrameTime lock")
+    
+    if arg == "/SWLCK":
+    
+        context = "uc"
+
+        command = "i"
+
+        print("Switch lock method")
+    
+    if arg == "/RGBC":
+    
+        context = "sc"
+
+        command = "L"
+
+        print("RGBHV/Component toggle")
+    
+    if arg == "/MAD":
+    
+        context = "sc"
+
+        command = "r"
+
+        print("Use motion adaptive deinterlacing")
+    
+    if arg == "/BOB":
+    
+        context = "sc"
+
+        command = "q"
+
+        print("Use Bob deinterlacing")
+    
+    # DEVELOPMENT
+    
+    if arg == "/FREEZ":
+    
+        context = "uc"
+
+        command = "F"
+
+        print("Freeze Capture")
+    
+    if arg == "/MBL":
+    
+        context = "sc"
+
+        command = "-"
+
+        print("Move picture left (memory blank)")
+    
+    if arg == "/MBR":
+    
+        context = "sc"
+
+        command = "+"
+
+        print("Move picture left (memory blank)")
+    
+    if arg == "/HSL":
+    
+        context = "sc"
+
+        command = "1"
+
+        print("Horizontal Sync Left")
+    
+    if arg == "/HSR":
+    
+        context = "sc"
+
+        command = "0"
+
+        print("Horizontal Sync Right")
+    
+    if arg == "/INFO":
+    
+        context = "sc"
+
+        command = "i"
+
+        print("Print infos")
+    
+    if arg == "/VTIM":
+    
+        context = "sc"
+
+        command = ","
+
+        print("Get video timings")
+    
+    if arg == "/CLKR":
+    
+        context = "sc"
+
+        command = "l"
+
+        print("Cycle Sdram clock speed")
+    
+    if arg == "/RSTC":
+    
+        context = "sc"
+
+        command = "q"
+
+        print("Reset chip")
+    
+    if arg == "/INVS":
+    
+        context = "sc"
+
+        command = "8"
+
+        print("Invert sync")
+    
+    if arg == "/PLLD":
+    
+        context = "sc"
+
+        command = "n"
+
+        print("MPLL divider ++")
+    
+    if arg == "/DEBG":
+    
+        context = "sc"
+
+        command = "D"
+
+        print("Debug view")
+    
+    if arg == "/ADCF":
+    
+        context = "sc"
+
+        command = "F"
+
+        print("ADC filter")
+    
+    if arg == "/OVRS":
+    
+        context = "sc"
+
+        command = "o"
+
+        print("Oversampling")
+    
+    if arg == "/HTOTU":
+    
+        context = "sc"
+
+        command = "a"
+
+        print("HTotal ++")
+    
+    if arg == "/HTOTD":
+    
+        context = "sc"
+
+        command = "A"
+
+        print("HTotal --")
+    
+    if arg == "/SNCHT":
+    
+        context = "sc"
+
+        command = "."
+
+        print("Resynch HTotal")
+    
+    if arg == "/RSTS":
+    
+        context = "uc"
+
+        command = "l"
+
+        print("Reset sync processor")
+    
+    if arg == "/SNAP":
+    
+        context = "sc"
+
+        command = "S"
+
+        print("Snap to 50/60hz")
+    
+    if arg == "/SNCW":
+    
+        context = "sc"
+
+        command = "m"
+
+        print("Syncwatcher")
+    
+    if arg == "/OTA":
+    
+        context = "sc"
+
+        command = "c"
+
+        print("Enable OTA update")
+    
+    if arg == "/IFAO":
+    
+        context = "sc"
+
+        command = "E"
+
+        print("IF auto offset")
+    
+    if arg == "/SOGL":
+    
+        context = "sc"
+
+        command = "z"
+
+        print("SOG Level --")
+    
+    # PICTURE CONTROL
+    
+    ## MOVE
+    
+    if arg == "/MVU":
+    
+        context = "sc"
+
+        command = "*"
+
+        print("Move up")
+    
+    if arg == "/MVD":
+    
+        context = "sc"
+
+        command = "/"
+
+        print("Move down")
+    
+    if arg == "/MVL":
+    
+        context = "sc"
+
+        command = "7"
+
+        print("Move left")
+    
+    if arg == "/MVR":
+    
+        context = "sc"
+
+        command = "6"
+
+        print("Move right")
+        
+    ## SCALING
+    
+    if arg == "/HORZU":
+                
+        context = "sc"
+
+        command = "z"
+
+        print("Horizontal +")
+    
+    if arg == "/HORZD":
+    
+        context = "sc"
+
+        command = "Horizontal -"
+
+        print("Move down")
+    
+    if arg == "/VERTU":
+    
+        context = "sc"
+
+        command = "4"
+
+        print("Vertical +")
+    
+    if arg == "/VERTD":
+    
+        context = "sc"
+
+        command = "5"
+
+        print("Vertical -")
+    
+    ## BORDER MASKING
+    
+    if arg == "/BMHU":
+    
+        context = "sc"
+
+        command = "A"
+
+        print("Border Masking : Horizontal +")
+    
+    if arg == "/BMHD":
+    
+        context = "sc"
+
+        command = "B"
+
+        print("Border Masking : Horizontal -")
+    
+    if arg == "/BMVU":
+    
+        context = "sc"
+
+        command = "C"
+
+        print("Border Masking : Vertical +")
+    
+    if arg == "/BMVD":
+    
+        context = "sc"
+
+        command = "D"
+
+        print("Border Masking : Vertical -")
+    
+    ## GAIN
+    
+    if arg == "/GAINU":
+    
+        context = "sc"
+
+        command = "n"
+
+        print("Vertical -")
+    
+    if arg == "/GAIND":
+    
+        context = "sc"
+
+        command = "o"
+
+        print("Vertical -")
+    
+    if arg == "/VERT-":
+    
+        context = "sc"
+
+        command = "T"
+
+        print("Vertical -")
+
+    
+    # Send the command
+
+    if context and command:
+        
+        conn.request( "GET", "/" + context + "?" + command )
+
+        response = conn.getresponse()
+
+        print(response.reason)
+    
+    return 0
+
+if __name__ == '__main__':
+    
+    sys.exit(main())
