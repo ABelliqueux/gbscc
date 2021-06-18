@@ -14,7 +14,7 @@ GBSCONTROL_ADDRESS = "gbscontrol.local"
 import sys
 import http.client
 
-conn = http.client.HTTPConnection( GBSCONTROL_ADDRESS )
+conn = http.client.HTTPConnection( GBSCONTROL_ADDRESS , timeout=3)
 
 context = ""
 
@@ -94,7 +94,7 @@ def main():
         
     "\tSystem :\n\n" +
         
-        "\t\t /RESET  Reset the GBS\n\n" + 
+        "\t\t /REST  Reset the GBS\n\n" + 
         
     "\tEnhancements:\n\n" + 
         
